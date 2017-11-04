@@ -1,0 +1,39 @@
+buildscript {
+    ext.kotlin_version = '1.1.51'
+    repositories {
+        //flatDir name:'localRepository', dir:'tomato/localRepository/plugins'
+        maven {
+            url  "https://dl.bintray.com/pachyrhizusren/tomato"
+        }
+        mavenCentral()
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.forufamily.gradle.plugin:tomato:1.0.1'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+ext {
+    compileSdkVersion = 26
+    buildToolsVersion = "26.0.2"
+    minSdkVersion = 17
+    targetSdkVersion = 22
+    supportVersion = "26.1.0"
+}

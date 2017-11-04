@@ -1,0 +1,98 @@
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.aspectj:aspectjtools:1.8.10'
+    }
+}
+
+dependencies {
+    implementation 'org.aspectj:aspectjrt:1.8.10'
+}
+
+def target(Project project) {
+    def plugin = plugin(project)
+    println plugin
+    switch (plugin) {
+        case 'com.android.application':
+            return android.applicationVariants
+        default:
+            return android.libraryVariants
+    }
+}
+
+static def plugin(Project project) {
+    if (project.plugins?.hasPlugin("com.android.library"))
+        return "com.android.library"
+    else
+        return "com.android.application"
+}
+
+// 定义plugin变量的目的是当Small框架替换字符串时会替换该变量的字符串
+// Small在编译库项目时，会将library替换成application进行编译，
+// 通过这个变量我们可以在正确的时候获取正确的variants变量
+//def androidPlugin = 'com.android.library'
+//void andoridPlugin(plugin) {
+//    androidPlugin = plugin
+//}
+
+target(project).all { variant ->
+    println "Variant: ${variant.name}"
+    //JavaCompile javaCompile = variant.hasProperty('javaCompiler') ? variant.javaCompiler : variant.javaCompile
+    JavaCompile javaCompile = variant.javaCompile
+    println "variant:开始注入-----------------------"
+
+    javaCompile.doLast {
+        println "执行ajc------------------------------"
+        List<File> inPath = new ArrayList<>()
+
+        javaCompile.inputs.each {
+            it.files
+                    .filter { it.isDirectory() }
+                    .each {
+                println "JavaCompile 输入文件:${it.absolutePath}"
+                inPath << it
+            }
+        }
+
+        println "输出路径:${javaCompile.destinationDir.absolutePath}"
+        String[] args = ["-showWeaveInfo",
+                         "-1.5",
+                         "-inpath", "C:\\Users\\Administrator\\Desktop\\Test2\\app\\build\\tmp\\kotlin-classes",//inPath.join(File.pathSeparator),
+                         "-aspectpath", javaCompile.classpath.asPath,
+                         "-d", javaCompile.destinationDir.absolutePath,
+                         "-classpath", javaCompile.classpath.asPath,
+                         "-bootclasspath", android.project.android.bootClasspath.join(File.pathSeparator)]
+        println "参数列表:${args}"
+
+        MessageHandler handler = new MessageHandler(true)
+        new Main().run(args, handler)
+
+        def log = project.logger
+        for (IMessage message : handler.getMessages(null, true)) {
+            println("ajc message: ${message.message}")
+            switch (message.getKind()) {
+                case IMessage.ABORT:
+                case IMessage.ERROR:
+                case IMessage.FAIL:
+                    log.error message.message, message.thrown
+                    break
+                case IMessage.WARNING:
+                    log.warn message.message, message.thrown
+                    break
+                case IMessage.INFO:
+                    log.info message.message, message.thrown
+                    break
+                case IMessage.DEBUG:
+                    log.debug message.message, message.thrown
+                    break
+            }
+        }
+    }
+}

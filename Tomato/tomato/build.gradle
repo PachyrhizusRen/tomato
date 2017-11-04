@@ -1,0 +1,12 @@
+apply plugin: 'groovy'
+apply from: 'config/jcenter-publish.gradle'
+//apply from: 'config/local-publish.gradle'
+
+def aspectjVersion = "1.8.10"
+
+dependencies {
+    compileOnly gradleApi()
+    implementation "org.aspectj:aspectjtools:${aspectjVersion}"
+    implementation "org.aspectj:aspectjrt:${aspectjVersion}"
+    implementation 'com.android.tools.build:gradle:3.0.0'
+}

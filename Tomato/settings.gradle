@@ -1,0 +1,2 @@
+include ':app', ':chat', ':kotlinlib'
+include ':tomato'

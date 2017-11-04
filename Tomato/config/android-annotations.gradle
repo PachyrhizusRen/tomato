@@ -1,0 +1,32 @@
+//apply plugin: 'android-apt'
+def AAVersion = '4.3.1'
+
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//        jcenter()
+//    }
+//
+//    dependencies {
+//        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+//    }
+//}
+
+dependencies {
+    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"
+    implementation "org.androidannotations:androidannotations-api:$AAVersion"
+}
+
+//apt {
+//    arguments {
+//        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
+//        // if you have multiple outputs (when using splits), you may want to have other index than 0
+//
+//        // you should set your package name here if you are using different application IDs
+//        // resourcePackageName "your.package.name"
+//
+//        // You can set optional annotation processing options here, like these commented options:
+//        // logLevel 'INFO'
+//        // logFile '/var/log/aa.log'
+//    }
+//}

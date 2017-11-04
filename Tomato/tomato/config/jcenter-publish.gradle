@@ -1,0 +1,93 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = PROJECT_GROUP
+version = PROJECT_VERSION
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'jar'
+                name PROJECT_NAME
+                url URL_SITE
+
+                licenses {
+                    license {
+                        name LICENCE_NAME
+                        url LICENCE_URL
+                        distribution LICENCE_DIST
+                    }
+                }
+
+                organization {
+                    name ORGANIZATION_ID
+                    url ORGANIZATION_URL
+                }
+
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+
+                scm {
+                    connection URL_GIT
+                    developerConnection URL_GIT
+                    url URL_SITE
+                }
+            }
+
+
+        }
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options {
+        encoding 'UTF-8'
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/8/docs/api"
+    }
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_APIKEY
+    configurations = ['archives']
+    pkg {
+        version {
+            name = PROJECT_VERSION
+            desc = "$PROJECT_NAME $PROJECT_VERSION"
+        }
+        repo = 'tomato'
+        name = PROJECT_NAME
+        desc = PROJECT_DESC
+        licenses = ['Apache-2.0']
+        websiteUrl = URL_SITE
+        vcsUrl = URL_GIT
+        labels = 'Groovy, Aspectj'
+        publicDownloadNumbers = true
+        publish = true
+    }
+}

@@ -1,0 +1,14 @@
+apply plugin: 'maven'
+
+group = PROJECT_GROUP
+version = PROJECT_VERSION
+
+uploadArchives {
+    //本地仓库的一种
+    repositories {
+        flatDir {
+            name "localRepository"
+            dir "localRepository/plugins"
+        }
+    }
+}
