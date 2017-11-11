@@ -28,9 +28,13 @@ A gradle plugin for android project to use Aspectj, support java, kotlin. And In
 	
 	...
 	
-	// just work on App
 	tomato {
+		// just work on App
 		debug true
+		// The item 'android.local.jars' means excludes all local jars. Cause all the local JarInput name startWith it.
+		excludedJars = ['android.local.jars']
+		// see: http://www.eclipse.org/aspectj/doc/released/devguide/ajc-ref.html
+		ajcArgs = [...]
 	}
 ```
 
@@ -38,6 +42,13 @@ A gradle plugin for android project to use Aspectj, support java, kotlin. And In
 ``` groovy
 	apply plugin: 'com.android.library'
 	apply plugin: 'tomato'
+	
+	...
+	
+	tomato {
+		excludedJars = [...]
+		ajcArgs = [...]
+	}
 ```
 
 ### License
