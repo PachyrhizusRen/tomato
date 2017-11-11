@@ -11,10 +11,12 @@ import java.util.jar.JarFile
 
 class WeaveStrategyFactory {
 
-    static WeaveStrategy create(Worker worker, TransformInvocation invocation) {
+    static WeaveStrategy create(Worker worker, TransformInvocation invocation, List<String> excludedJars) {
         def inputs = invocation.inputs
         def provider = invocation.outputProvider
-        invocation.incremental && !aspectChanged(invocation, collectClassPath(invocation, worker.bootClassPath)) ? new IncrementalWeaveStrategy(worker, inputs, provider) : new NoIncrementalWeaveStrategy(worker, inputs, provider)
+        return invocation.incremental && !aspectChanged(invocation, collectClassPath(invocation, worker.bootClassPath)) ?
+                new IncrementalWeaveStrategy(worker, inputs, provider, excludedJars) :
+                new NoIncrementalWeaveStrategy(worker, inputs, provider, excludedJars)
     }
 
     private static Collection<File> collectClassPath(TransformInvocation invocation, String bootClassPath) {

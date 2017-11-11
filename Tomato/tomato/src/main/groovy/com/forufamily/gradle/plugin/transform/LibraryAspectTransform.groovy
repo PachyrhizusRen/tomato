@@ -1,8 +1,6 @@
 package com.forufamily.gradle.plugin.transform
 
-import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import com.forufamily.gradle.plugin.ajc.Worker
 import com.forufamily.gradle.plugin.strategy.WeaveStrategy
@@ -28,23 +26,8 @@ class LibraryAspectTransform extends BaseAspectTransform {
     @Override
     Set<? super QualifiedContent.Scope> getReferencedScopes() {
         return ImmutableSet.<QualifiedContent.Scope> of(
-                QualifiedContent.Scope.PROJECT,
                 QualifiedContent.Scope.EXTERNAL_LIBRARIES
         )
-    }
-
-    // 判断当前是否包含Aspectj运行时
-    @Override
-    protected boolean hasAspectJrt(TransformInvocation invocation) {
-        for (TransformInput transformInput : invocation.referencedInputs) {
-            for (JarInput jarInput : transformInput.jarInputs) {
-                "referencedInputs[${jarInput.file.absolutePath}]".info()
-                if (jarInput.file.absolutePath.contains(ASPECTJ_RT)) {
-                    return true
-                }
-            }
-        }
-        return false
     }
 
     @Override
@@ -53,7 +36,7 @@ class LibraryAspectTransform extends BaseAspectTransform {
 
         debugInputs(invocation.inputs)
         WeaveStrategy strategy = LibraryWeaveStrategyProxy
-                .wrap(WeaveStrategyFactory.create(worker, invocation))
+                .wrap(WeaveStrategyFactory.create(worker, invocation, excludedJars()))
                 .invocation(invocation)
         strategy.start()
 

@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply from: 'config/jcenter-publish.gradle'
 //apply from: 'config/local-publish.gradle'
 
-def aspectjVersion = "1.8.10"
+def aspectjVersion = "1.8.12"
 
 dependencies {
     compileOnly gradleApi()

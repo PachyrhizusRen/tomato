@@ -1,8 +1,6 @@
 package com.forufamily.gradle.plugin.transform
 
-import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import com.forufamily.gradle.plugin.ajc.Worker
 import com.forufamily.gradle.plugin.strategy.WeaveStrategy
@@ -14,6 +12,13 @@ class AppAspectTransform extends BaseAspectTransform {
 
     AppAspectTransform(Project project) {
         super(project)
+    }
+
+    @Override
+    Set<? super QualifiedContent.Scope> getReferencedScopes() {
+        return ImmutableSet.<QualifiedContent.Scope> of(
+                QualifiedContent.Scope.EXTERNAL_LIBRARIES
+        )
     }
 
     @Override
@@ -39,25 +44,12 @@ class AppAspectTransform extends BaseAspectTransform {
         }
     }
 
-    // 判断当前是否包含Aspectj运行时
-    @Override
-    protected boolean hasAspectJrt(TransformInvocation invocation) {
-        for (TransformInput transformInput : invocation.inputs) {
-            for (JarInput jarInput : transformInput.jarInputs) {
-                if (jarInput.file.absolutePath.contains(ASPECTJ_RT)) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
     @Override
     protected void doTransform(TransformInvocation invocation, Worker worker) {
         "[$projectName]开始织入切面--------------------------------------".info()
 
         debugInputs(invocation.inputs)
-        WeaveStrategy strategy = WeaveStrategyFactory.create(worker, invocation)
+        WeaveStrategy strategy = WeaveStrategyFactory.create(worker, invocation, excludedJars())
         strategy.start()
 
         "[$projectName]切面织入完毕--------------------------------------".info()

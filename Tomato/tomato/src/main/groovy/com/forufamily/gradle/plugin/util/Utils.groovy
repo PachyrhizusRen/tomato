@@ -5,6 +5,7 @@ import com.android.build.api.transform.*
 import com.android.builder.packaging.JarMerger
 import com.android.builder.packaging.ZipEntryFilter
 import com.google.common.io.Files
+import org.apache.commons.io.FileUtils
 
 class Utils {
 
@@ -30,7 +31,7 @@ class Utils {
     static void copyDirectory(TransformInput input, TransformOutputProvider provider) {
         input.directoryInputs.each { dir ->
             def dest = getOutputPath(provider, dir)
-            Files.copy(dir.file, dest)
+            FileUtils.copyDirectory(dir.file, dest)
             "复制目录[${dir.name}]".info()
         }
     }

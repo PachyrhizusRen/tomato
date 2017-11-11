@@ -33,6 +33,7 @@ class Worker {
                 targetCompatibility = javaCompile.targetCompatibility
             }
         }
+        ajcArgs.addAll project.tomato.ajcArgs ?: []
     }
 
     def getInPath() {
@@ -89,10 +90,11 @@ class Worker {
             if (!ajcArgs.contains('-warn')) {
                 args << '-warn:none'
             }
-            args << ajcArgs
+            args.addAll ajcArgs
         } else {
             args << '-Xlint:ignore' << '-warn:none'
         }
+        //"参数列表:$args".info()
 
         MessageHandler handler = new MessageHandler(false)
         handler.dontIgnore(IMessage.WEAVEINFO)

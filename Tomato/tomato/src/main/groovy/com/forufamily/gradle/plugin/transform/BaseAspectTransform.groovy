@@ -16,6 +16,10 @@ abstract class BaseAspectTransform extends Transform {
         worker = new Worker(project)
     }
 
+    List<String> excludedJars() {
+        return project.tomato.excludedJars
+    }
+
     String getProjectName() {
         return project?.name
     }
@@ -54,6 +58,29 @@ abstract class BaseAspectTransform extends Transform {
         }
     }
 
+    // 判断当前是否包含Aspectj运行时
+    protected boolean hasAspectJrt(TransformInvocation invocation) {
+        for (transformInput in invocation.referencedInputs) {
+            for (jarInput in transformInput.jarInputs) {
+                // After Desugar transform, the file's name was changed, but the 'JarInput' would be contain right info.
+                if (jarInput.name.toLowerCase().contains(ASPECTJ_RT)
+                        || jarInput.file.absolutePath.toLowerCase().contains(ASPECTJ_RT)) {
+                    return true
+                }
+            }
+        }
+
+        // debug
+        "判断Aspectjrt调试信息--------------------------".info()
+        invocation.referencedInputs.each {
+            it.jarInputs.each {
+                "${it.file.absolutePath}".info()
+            }
+        }
+        "判断Aspectjrt调试信息--------------------------".info()
+        return false
+    }
+
     // 输入文件列表Debug信息
     protected static void debugInputs(Collection<TransformInput> inputs) {
         inputs.each {
@@ -78,7 +105,4 @@ abstract class BaseAspectTransform extends Transform {
 
     // 准备工作完毕，开始处理
     protected abstract void doTransform(TransformInvocation invocation, Worker worker)
-
-    // 是否有Aspectj运行时
-    protected abstract boolean hasAspectJrt(TransformInvocation invocation)
 }

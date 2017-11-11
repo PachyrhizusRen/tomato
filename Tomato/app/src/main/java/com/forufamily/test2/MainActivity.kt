@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
         println("调用Messager， 它是Java类--修改测试InstantRun")
         Messager.message()
 
+        Messager().otherMessage()
+
         val desk = Sender()
         println(desk)
 

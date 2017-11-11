@@ -8,8 +8,8 @@ import com.forufamily.gradle.plugin.util.Utils
 
 class NoIncrementalWeaveStrategy extends BaseAspectStrategy {
 
-    NoIncrementalWeaveStrategy(Worker worker, Collection<TransformInput> inputs, TransformOutputProvider provider) {
-        super(worker, inputs, provider)
+    NoIncrementalWeaveStrategy(Worker worker, Collection<TransformInput> inputs, TransformOutputProvider provider, List<String> excludedJars) {
+        super(worker, inputs, provider, excludedJars)
     }
 
     @Override
@@ -17,7 +17,7 @@ class NoIncrementalWeaveStrategy extends BaseAspectStrategy {
         inputs.each {
             // Jar文件处理
             it.jarInputs.each { jar ->
-                if (jar.scopes.contains(QualifiedContent.Scope.SUB_PROJECTS)) {
+                if (jar.scopes.contains(QualifiedContent.Scope.SUB_PROJECTS) || exclude(jar)) {
                     // 如果是子项目(Library)，直接复制，子项目做自己的织入
                     Utils.copyJar(jar, provider)
                 } else {

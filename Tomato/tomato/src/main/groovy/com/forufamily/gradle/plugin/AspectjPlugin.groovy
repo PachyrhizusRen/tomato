@@ -24,11 +24,11 @@ class AspectjPlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            implementation 'org.aspectj:aspectjrt:1.8.10'
+            implementation 'org.aspectj:aspectjrt:1.8.12'
         }
 
+        project.extensions.create("tomato", ProjectExtension)
         if (project.plugins.hasPlugin(AppPlugin)) {
-            project.extensions.create("tomato", ProjectExtension)
             LangExtensions.init(project)// MetaClass方法扩展
 
             AppExtension app = project.extensions.getByType(AppExtension)
