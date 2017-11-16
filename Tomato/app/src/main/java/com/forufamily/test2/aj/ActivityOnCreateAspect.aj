@@ -1,6 +1,7 @@
 package com.forufamily.test2.aj;
 
 import org.aspectj.lang.Signature;
+import android.app.Activity;
 
 public aspect ActivityOnCreateAspect {
 
@@ -8,6 +9,6 @@ public aspect ActivityOnCreateAspect {
 
     before() : onCreate(){
          Signature signature = thisJoinPoint.getSignature();
-         System.out.println("在调用"+signature.getName());
+         System.out.println("调用" + signature.getName());
     }
 }

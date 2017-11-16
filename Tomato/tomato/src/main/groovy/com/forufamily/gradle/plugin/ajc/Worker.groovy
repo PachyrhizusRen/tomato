@@ -1,6 +1,7 @@
 package com.forufamily.gradle.plugin.ajc
 
 import com.forufamily.gradle.plugin.config.Configurations
+import com.forufamily.gradle.plugin.tasks.AjFileProcessTask
 import org.aspectj.bridge.IMessage
 import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
@@ -23,6 +24,10 @@ class Worker {
 
     Worker(Project project) {
         log = project.logger
+
+        // call .aj files
+        AjFileProcessTask.attach(project)
+
         project.afterEvaluate {
             def configuration = new Configurations(project)
             configuration.variants.all { variant ->

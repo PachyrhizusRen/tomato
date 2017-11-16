@@ -14,8 +14,9 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.forufamily.gradle.plugin:tomato:1.0.2-alpha4'
+        classpath 'com.forufamily.gradle.plugin:tomato:1.0.3-alpha25'
         classpath 'org.aspectj:aspectjtools:1.8.12'
+        classpath 'org.eclipse:text:3.3.0-v20070606-0010'
     }
 }
 
