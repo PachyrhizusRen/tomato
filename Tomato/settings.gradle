@@ -1,2 +1,2 @@
-include ':app', ':chat', ':kotlinlib'
+include ':app', ':chat', ':kotlinlib', ':common'
 include ':tomato'

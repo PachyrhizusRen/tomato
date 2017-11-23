@@ -26,7 +26,8 @@ class LibraryAspectTransform extends BaseAspectTransform {
     @Override
     Set<? super QualifiedContent.Scope> getReferencedScopes() {
         return ImmutableSet.<QualifiedContent.Scope> of(
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES
+                QualifiedContent.Scope.EXTERNAL_LIBRARIES,
+                QualifiedContent.Scope.SUB_PROJECTS
         )
     }
 
