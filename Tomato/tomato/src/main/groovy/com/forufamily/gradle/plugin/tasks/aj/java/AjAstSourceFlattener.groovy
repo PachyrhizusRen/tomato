@@ -79,22 +79,40 @@ class AjAstSourceFlattener extends AjNaiveASTFlattener {
         return !adviceProcess(node, "@org.aspectj.lang.annotation.After", "void")
     }
 
-    private boolean adviceProcess(ASTNode node, String annotation, String returnType) {
+    private boolean adviceProcess(AdviceDeclaration node, String annotation, String returnType) {
         if (null != node) {
             callPrintIndent()
             buffer.append(" $annotation(").append("\"")
             node.pointcut.accept(this)
             buffer.append("()\")\n")
 
+            // e.g: before(Object text) : setMethod()
+            // Java code will be: public void adviceSetMethod(org.aspectj.lang.JoinPoint thisJoinPoint, Object text)
+            // Advice define
             callPrintIndent()
             buffer.append(" public $returnType advice")
-            node.pointcut.accept(this)
-            buffer.append("(org.aspectj.lang.JoinPoint thisJoinPoint) ")
-            node.body.accept(this)
+            buffer.append(getResult(node.pointcut).firstLetterUpperCase())
+            buffer.append("(org.aspectj.lang.JoinPoint thisJoinPoint")
+            def visitor = this
+            // parameter process
+            node.parameters().each {
+                if(it instanceof ASTNode) {
+                    buffer.append(", ")
+                    it.accept(visitor)
+                }
+            }
+            buffer.append(") ")
 
+            node.body.accept(this)
             return true
         }
         return false
+    }
+
+    static String getResult(ASTNode node) {
+        def visitor = new AjNaiveASTFlattener()
+        node.accept(visitor)
+        return visitor.result
     }
 
     @Override

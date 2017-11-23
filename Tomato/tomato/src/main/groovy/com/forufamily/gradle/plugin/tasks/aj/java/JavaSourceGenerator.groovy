@@ -15,13 +15,13 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.util.PatternSet
 
 class JavaSourceGenerator implements Callable {
-    static final PatternSet PATTERN_SET = new PatternSet().include(["**/*.aj"])
+    private static final PatternSet PATTERN_SET = new PatternSet().include(["**/*.aj"])
+    private static final String DIR_NAME_GEN = "build/generated/source/ajg/"
     private final JavaCompile javaCompile
     private final Project project
     private BuildType buildType
-    private static final String DIR_NAME_GEN = "build/generated/source/ajg/"
     private File target
-    List<Object> sourceSet
+    private List<Object> sourceSet
 
     JavaSourceGenerator(Project project, JavaCompile javaCompile, BuildType buildType) {
         this.javaCompile = javaCompile
@@ -43,7 +43,7 @@ class JavaSourceGenerator implements Callable {
         parser.setCompilerOptions(new HashMap<>())
         def visitor = new AjAstSourceFlattener()
 
-        getProjectSourceFiles().each {
+        ajFiles().each {
             def file = new File(it)
             parser.setSource(file.text.toCharArray())
             def unit = parser.createAST(null) as CompilationUnit
@@ -73,7 +73,7 @@ class JavaSourceGenerator implements Callable {
         return javaFile
     }
 
-    List<String> getProjectSourceFiles() {
+    List<String> ajFiles() {
         def extension = findExtension()
 
         if (sourceSet.isEmpty()) {

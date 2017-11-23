@@ -1,10 +1,13 @@
 package com.forufamily.gradle.plugin.strategy
 
+import aj.org.objectweb.asm.Opcodes
 import com.android.build.api.transform.Status
 import com.android.build.api.transform.TransformInvocation
 import com.forufamily.gradle.plugin.ajc.Worker
+import com.forufamily.gradle.plugin.asm.AspectVisitor
 import com.forufamily.gradle.plugin.strategy.impl.IncrementalWeaveStrategy
 import com.forufamily.gradle.plugin.strategy.impl.NoIncrementalWeaveStrategy
+import org.objectweb.asm.ClassReader
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -62,7 +65,7 @@ class WeaveStrategyFactory {
             return it.directoryInputs.find { dir ->
                 // 查找变化的目录中是否存在变化的切面class
                 def result = dir.changedFiles
-                        .find { file, status -> return care(status) && hasAspect(file, dir.file, loader) }
+                        .find { file, status -> return care(status) && hasAspect(file) }
                 return result
             } || it.jarInputs.find { jar ->
                 if (care(jar.status)) {
@@ -70,7 +73,7 @@ class WeaveStrategyFactory {
                     JarFile jarFile = new JarFile(jar.file)
 
                     def result = jarFile.entries().find { entry ->
-                        return hasAspect(entry, loader)
+                        return hasAspect(entry, jarFile)
                     }
                     return result
                 }
@@ -88,27 +91,23 @@ class WeaveStrategyFactory {
     }
 
     // 分析JarEntry的class中是否有Aspect注解存在(由于确定jar中Class变化的逻辑比较复杂, 这里使用的粒度为整个jar)
-    private static boolean hasAspect(JarEntry entry, ClassLoader loader) {
+    private static boolean hasAspect(JarEntry entry, JarFile jarFile) {
         // jar中可能存在非class文件(如: .properties, .MF)
         if (entry.name.toLowerCase().endsWith(".class")) {
-            def className = entry.name.replace(".class", "").replace("/", ".")
-            return hasAnnotation(loader, className)
+            return hasAspect(jarFile.getInputStream(entry).bytes)
         }
         return false
     }
 
     // 分析class文件是否有Aspect注解存在
-    private static boolean hasAspect(File file, File dir, ClassLoader loader) {
-        def className = file.absolutePath.replace(dir.absolutePath, "").replace(".class", "").replace(File.separator, ".")
-        className = className.startsWith(".") ? className.substring(1) : className
-        return hasAnnotation(loader, className)
+    private static boolean hasAspect(File classFile) {
+        return hasAspect(classFile.bytes)
     }
 
-    // 根据类名称判断对应的类中是否存在Aspect注解
-    private static boolean hasAnnotation(ClassLoader loader, String className) {
-        def clazz = loader.loadClass(className)
-        def aspect = loader.loadClass("org.aspectj.lang.annotation.Aspect")
-        "类[${clazz.simpleName}]中是否有Aspect注解:${clazz.isAnnotationPresent(aspect)}".info()
-        return clazz.isAnnotationPresent(aspect)
+    private static boolean hasAspect(byte[] bytes) {
+        def reader = new ClassReader(bytes)
+        def visitor = new AspectVisitor(Opcodes.ASM4)
+        reader.accept(visitor, Opcodes.ASM4)
+        return visitor.hasAspect
     }
 }
