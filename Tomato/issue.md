@@ -10,7 +10,7 @@ public class DebuggerAspect {
         //...
 
         if (level > Debugger.NONE && level <= Debugger.A) {
-             Log.println(PriorityConverter.convert(level), tag, msg);
+             Log.println(priority(level), tag, msg);
         } else {
              System.out.println(msg);
         }
@@ -19,7 +19,7 @@ public class DebuggerAspect {
     }
 
     @LogPriority
-    public static int convert(int level) {
+    public static int priority(int level) {
          switch (level) {
          case Debugger.I:
                return Log.INFO;
