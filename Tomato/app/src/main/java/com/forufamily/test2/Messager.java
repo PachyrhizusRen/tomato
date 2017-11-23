@@ -1,10 +1,14 @@
 package com.forufamily.test2;
 
+import android.os.Handler;
+
 public class Messager {
     private static String name = "Hello";
 
+    private static Handler handler = new Handler();
+
     public void otherMessage() {
-        call(() -> "message");
+        call(() -> "other--message11");
     }
 
     private void call(OnMessage o) {

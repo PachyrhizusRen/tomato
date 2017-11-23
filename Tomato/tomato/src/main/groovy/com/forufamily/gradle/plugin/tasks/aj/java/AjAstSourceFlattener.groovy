@@ -91,7 +91,7 @@ class AjAstSourceFlattener extends AjNaiveASTFlattener {
             // Advice define
             callPrintIndent()
             buffer.append(" public $returnType advice")
-            buffer.append(getResult(node.pointcut).firstLetterUpperCase())
+            buffer.append(getResult(node.pointcut).capitalize())
             buffer.append("(org.aspectj.lang.JoinPoint thisJoinPoint")
             def visitor = this
             // parameter process
