@@ -32,7 +32,7 @@ class Utils {
         input.directoryInputs.each { dir ->
             def dest = getOutputPath(provider, dir)
             FileUtils.copyDirectory(dir.file, dest)
-            "复制目录[${dir.name}]".info()
+            "Copy directory:[${dir.name}]".info()
         }
     }
 
@@ -40,14 +40,14 @@ class Utils {
     static void copyJar(JarInput jar, TransformOutputProvider provider) {
         def dest = getOutputPath(provider, jar)
         Files.copy(jar.file, dest)
-        "复制Jar文件[${jar.name}]".info()
+        "Copy jar file:[${jar.name}]".info()
     }
 
     // 删除单个jar文件 (Output)
     static void removeJar(JarInput jar, TransformOutputProvider provider) {
         def dest = getOutputPath(provider, jar)
         if (dest.exists() && dest.delete()) {
-            "删除Jar文件[${jar.name}]".info()
+            "Delete jar file:[${jar.name}]".info()
         }
     }
 
@@ -59,7 +59,7 @@ class Utils {
     }
 
     static void mergeJar(File input, File output) {
-        "合并目录[${input.absolutePath}]到[${output.absolutePath}]".info()
+        "Merge files from [${input.absolutePath}] to [${output.absolutePath}]".info()
         JarMerger jarMerger = null
         try {
             jarMerger = new JarMerger(output.toPath(), ZipEntryFilter.CLASSES_ONLY)
@@ -67,7 +67,13 @@ class Utils {
         } catch (IOException e) {
             throw new TransformException(e)
         } finally {
-            jarMerger?.close()
+            tryClose(jarMerger)
         }
+    }
+
+    static void tryClose(Closeable closeable) {
+        try {
+            closeable?.close()
+        } catch (Throwable e) { e.printStackTrace()}
     }
 }

@@ -29,9 +29,9 @@ class JavaSourceGenerator implements Callable {
         this.buildType = buildType
         sourceSet = new ArrayList<>()
 
-        // 生成的java文件会放入"generated/source/ajg"目录中
+        // The generated java file will be put into "generated/source/ajg"
         target = new File(project.getProjectDir(), DIR_NAME_GEN + buildType.name)
-        "代码生成目录:${target.absolutePath}".info()
+        "Generator work path:${target.absolutePath}".info()
         if (target.exists()) FileUtils.deleteDirectory(target)
         target.mkdirs()
     }
@@ -59,7 +59,7 @@ class JavaSourceGenerator implements Callable {
     File write(File sourceFile, String content) {
         File sourcePath = sourceSet.find { sourceFile.absolutePath.startsWith(it.absolutePath) }
         if (null == sourcePath) {
-            "放弃写入, 未知源代码目录:$sourceFile".info()
+            "Abort generation, can not find source path:$sourceFile".info()
             return null
         }
 
@@ -68,7 +68,7 @@ class JavaSourceGenerator implements Callable {
         if (!javaFile.getParentFile().exists()) javaFile.getParentFile().mkdirs()
         if (!javaFile.exists()) javaFile.createNewFile()
 
-        "生成的java文件写入:${javaFile.absolutePath}".info()
+        "Generated java file:[${javaFile.absolutePath}]".info()
         javaFile.write(content, "utf-8")
         return javaFile
     }
@@ -79,7 +79,7 @@ class JavaSourceGenerator implements Callable {
         if (sourceSet.isEmpty()) {
             extension.sourceSets.each {
                 it.java.srcDirs.each {
-                    "sourceSet:$it".info()
+                    "Add to sourceSets:$it".info()
                     sourceSet << it
                 }
             }
@@ -90,7 +90,7 @@ class JavaSourceGenerator implements Callable {
                 .stream()
                 .map { it.absolutePath }
                 .collect()
-        "aj文件列表:$list".info()
+        "All .aj files:$list".info()
         return list
     }
 

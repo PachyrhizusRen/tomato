@@ -29,7 +29,7 @@ class AspectjPlugin implements Plugin<Project> {
 
         project.extensions.create("tomato", ProjectExtension)
         if (project.plugins.hasPlugin(AppPlugin)) {
-            LangExtensions.init(project)// MetaClass方法扩展
+            LangExtensions.init(project)// MetaClass extensions
 
             AppExtension app = project.extensions.getByType(AppExtension)
             app.registerTransform(new AppAspectTransform(project))

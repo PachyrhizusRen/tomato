@@ -1,10 +1,13 @@
 package com.forufamily.gradle.plugin.strategy.impl
 
+import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformOutputProvider
 import com.forufamily.gradle.plugin.ajc.Worker
 import com.forufamily.gradle.plugin.strategy.WeaveStrategy
+
+import java.util.regex.Pattern
 
 abstract class BaseAspectStrategy implements WeaveStrategy {
     protected final Worker worker
@@ -19,11 +22,12 @@ abstract class BaseAspectStrategy implements WeaveStrategy {
         this.excludedJars = excludedJars
     }
 
-    protected boolean exclude(QualifiedContent content) {
+    protected boolean exclude(JarInput content) {
         boolean result = excludedJars.find {
             // We just wanna a JarInput actually.
-            content.name.toLowerCase().startsWith(it.toLowerCase())
-        }
+            Pattern.matches(it, content.name)
+            //content.name.toLowerCase().startsWith(it.toLowerCase())
+        }/
         if (result) "[$content.name] is in excludedJar list, so skips the weave action.".info()
         return result
     }

@@ -7,6 +7,7 @@ import com.forufamily.gradle.plugin.ajc.Worker
 import com.forufamily.gradle.plugin.asm.AspectVisitor
 import com.forufamily.gradle.plugin.strategy.impl.IncrementalWeaveStrategy
 import com.forufamily.gradle.plugin.strategy.impl.NoIncrementalWeaveStrategy
+import com.google.common.io.Closer
 import org.objectweb.asm.ClassReader
 
 import java.util.jar.JarEntry
@@ -17,50 +18,15 @@ class WeaveStrategyFactory {
     static WeaveStrategy create(Worker worker, TransformInvocation invocation, List<String> excludedJars) {
         def inputs = invocation.inputs
         def provider = invocation.outputProvider
-        return invocation.incremental && !aspectChanged(invocation, collectClassPath(invocation, worker.bootClassPath)) ?
+        return invocation.incremental && !aspectChanged(invocation) ?
                 new IncrementalWeaveStrategy(worker, inputs, provider, excludedJars) :
                 new NoIncrementalWeaveStrategy(worker, inputs, provider, excludedJars)
-    }
-
-    private static Collection<File> collectClassPath(TransformInvocation invocation, String bootClassPath) {
-        def classPath = new ArrayList<File>()
-        // 需要所有的文件都在classPath中，确保在解析类时不会出现NoClassFoundException
-        invocation.inputs.each {
-            it.directoryInputs.each { dir ->
-                classPath << dir.file
-            }
-
-            it.jarInputs.each { jar ->
-                classPath << jar.file
-            }
-        }
-
-        invocation.referencedInputs.each {
-            it.directoryInputs.each { dir ->
-                classPath << dir.file
-            }
-
-            it.jarInputs.each { jar ->
-                classPath << jar.file
-            }
-        }
-
-        // 需要将bootClassPath放入到classPath中，防止在分析Class时找不到android.app.Activity等Class
-        bootClassPath?.split(File.pathSeparator)?.each {
-            classPath << it.toFile()
-        }
-        return classPath
     }
 
     // 增量转换时，分析切面是否发生变化。如果切面发生变化，则直接进行非增量织入。
     // 这里的分析粒度很大(仅分析切面)，目前暂时无法实现精细的分析切点。不过既然aspectj能够织入，我们使用相同的方案应该也能够完成这个工作。
     // 可以作为后期扩展方向
-    private static boolean aspectChanged(TransformInvocation invocation, Collection<File> classPath) {
-        def urls = classPath.stream()
-                .map { it.toURI().toURL() }
-                .collect()
-                .toArray(new URL[classPath.size()])
-        def loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader())
+    private static boolean aspectChanged(TransformInvocation invocation) {
         def result = invocation.inputs.find {
             return it.directoryInputs.find { dir ->
                 // 查找变化的目录中是否存在变化的切面class
@@ -69,18 +35,23 @@ class WeaveStrategyFactory {
                 return result
             } || it.jarInputs.find { jar ->
                 if (care(jar.status)) {
+                    def closer = Closer.create()
                     // 查找变化的jar文件中是否存在切面class
-                    JarFile jarFile = new JarFile(jar.file)
-
-                    def result = jarFile.entries().find { entry ->
-                        return hasAspect(entry, jarFile)
+                    try {
+                        JarFile jarFile = closer.register(new JarFile(jar.file))
+                        def result = jarFile.entries().find { entry ->
+                            return hasAspect(entry, jarFile)
+                        }
+                        return result
+                    } catch (Throwable e) {
+                        closer.rethrow(e)
+                    } finally {
+                        closer.close()
                     }
-                    return result
                 }
                 return false
             }
         }
-        loader.close()
         if (result) "发现切面资源发生变化, 禁用增量转换".info()
         return result
     }
@@ -101,7 +72,7 @@ class WeaveStrategyFactory {
 
     // 分析class文件是否有Aspect注解存在
     private static boolean hasAspect(File classFile) {
-        return hasAspect(classFile.bytes)
+        return classFile.exists() && !classFile.isDirectory() && hasAspect(classFile.bytes)
     }
 
     private static boolean hasAspect(byte[] bytes) {
