@@ -1,0 +1,52 @@
+apply plugin: 'maven'
+
+group = PROJECT_GROUP
+version = PROJECT_VERSION
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            snapshotRepository(url: 'http://192.168.0.81:8081/repository/maven-snapshots/') {
+                authentication(userName: USERNAME_LOCAL_NEXUS, password: PASSWORD_LOCAL_NEXUS)
+            }
+
+            repository(url: 'http://192.168.0.81:8081/repository/maven-releases/') {
+                authentication(userName: USERNAME_LOCAL_NEXUS, password: PASSWORD_LOCAL_NEXUS)
+            }
+
+            pom.project {
+                version PROJECT_VERSION
+                artifactId PROJECT_NAME
+                groupId PROJECT_GROUP
+                packaging 'jar'
+                description PROJECT_DESC
+            }
+        }
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options {
+        encoding 'UTF-8'
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/8/docs/api"
+    }
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}

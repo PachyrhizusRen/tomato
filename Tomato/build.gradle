@@ -1,20 +1,21 @@
 buildscript {
-    ext.kotlin_version = '1.1.51'
+    ext.kotlin_version = '1.2.10'
     repositories {
-        flatDir name:'localRepository', dir:'tomato/localRepository/plugins'
+        //flatDir name:'localRepository', dir:'tomato/localRepository/plugins'
         //maven {
         //    url  "https://dl.bintray.com/pachyrhizusren/tomato"
         //}
+        maven { url 'http://192.168.0.81:8081/repository/maven-public/' }
         mavenCentral()
         jcenter()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.forufamily.gradle.plugin:tomato:1.0.4-alpha'
+        classpath 'com.forufamily.gradle.plugin:tomato:1.0.5'
         classpath 'org.aspectj:aspectjtools:1.8.12'
         classpath 'org.eclipse:text:3.3.0-v20070606-0010'
     }

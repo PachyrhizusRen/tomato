@@ -74,6 +74,9 @@ class Utils {
     static void tryClose(Closeable closeable) {
         try {
             closeable?.close()
-        } catch (Throwable e) { e.printStackTrace()}
+        } catch (Throwable e) {
+            e.printStackTrace()
+        }
     }
+
 }

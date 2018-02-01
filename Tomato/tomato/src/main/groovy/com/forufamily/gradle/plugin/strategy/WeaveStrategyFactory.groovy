@@ -30,19 +30,16 @@ class WeaveStrategyFactory {
         def result = invocation.inputs.find {
             return it.directoryInputs.find { dir ->
                 // 查找变化的目录中是否存在变化的切面class
-                def result = dir.changedFiles
-                        .find { file, status -> return care(status) && hasAspect(file) }
-                return result
+                def result = dir.changedFiles.find { file, status -> care(status) && hasAspect(file) }
+                return null != result
             } || it.jarInputs.find { jar ->
                 if (care(jar.status)) {
                     def closer = Closer.create()
                     // 查找变化的jar文件中是否存在切面class
                     try {
                         JarFile jarFile = closer.register(new JarFile(jar.file))
-                        def result = jarFile.entries().find { entry ->
-                            return hasAspect(entry, jarFile)
-                        }
-                        return result
+                        def result = jarFile.entries().find { entry -> hasAspect(entry, jarFile) }
+                        return null != result
                     } catch (Throwable e) {
                         closer.rethrow(e)
                     } finally {
@@ -53,6 +50,7 @@ class WeaveStrategyFactory {
             }
         }
         if (result) "发现切面资源发生变化, 禁用增量转换".info()
+        //invocation.debugFileStatus()
         return result
     }
 
@@ -72,7 +70,10 @@ class WeaveStrategyFactory {
 
     // 分析class文件是否有Aspect注解存在
     private static boolean hasAspect(File classFile) {
-        return classFile.exists() && !classFile.isDirectory() && hasAspect(classFile.bytes)
+        try {
+            return classFile.exists() && !classFile.isDirectory() && hasAspect(classFile.bytes)
+        } catch (Exception ignored){}
+        return false
     }
 
     private static boolean hasAspect(byte[] bytes) {

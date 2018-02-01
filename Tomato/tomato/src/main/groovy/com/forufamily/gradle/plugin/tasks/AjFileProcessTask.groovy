@@ -2,7 +2,7 @@ package com.forufamily.gradle.plugin.tasks
 
 import com.forufamily.gradle.plugin.config.Configurations
 import com.forufamily.gradle.plugin.tasks.aj.Callable
-import com.forufamily.gradle.plugin.tasks.aj.java.JavaSourceGenerator
+import com.forufamily.gradle.plugin.tasks.aj.generator.JavaSourceGenerator
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 

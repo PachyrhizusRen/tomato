@@ -6,7 +6,7 @@ class AjBuildProgressMonitor implements IBuildProgressMonitor {
 
     @Override
     void begin() {
-        "开始编译".inof()
+        "开始编译".info()
     }
 
     @Override

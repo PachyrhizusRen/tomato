@@ -1,4 +1,4 @@
-package com.forufamily.gradle.plugin.tasks.aj.java
+package com.forufamily.gradle.plugin.tasks.aj.generator
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin

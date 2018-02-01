@@ -23,11 +23,7 @@ abstract class BaseAspectStrategy implements WeaveStrategy {
     }
 
     protected boolean exclude(JarInput content) {
-        boolean result = excludedJars.find {
-            // We just wanna a JarInput actually.
-            Pattern.matches(it, content.name)
-            //content.name.toLowerCase().startsWith(it.toLowerCase())
-        }/
+        boolean result = excludedJars.find { Pattern.matches(it, content.name) }
         if (result) "[$content.name] is in excludedJar list, so skips the weave action.".info()
         return result
     }
@@ -40,6 +36,7 @@ abstract class BaseAspectStrategy implements WeaveStrategy {
                     aspectPath << dir.file
                     classPath << dir.file
                 }
+                //dir.debugFileStatus()
             }
 
             it.jarInputs.each { jar ->
@@ -47,6 +44,7 @@ abstract class BaseAspectStrategy implements WeaveStrategy {
                     aspectPath << jar.file// 所有jar中的切面也可以工作
                     classPath << jar.file
                 }
+                //jar.debugFileStatus()
             }
         }
 
@@ -57,7 +55,9 @@ abstract class BaseAspectStrategy implements WeaveStrategy {
         "".info()
         "开始进行[${content.file.absolutePath}]织入".info()
         "[ajc.aspectPath]:${worker.aspectPath}\n[ajc.inPath]:${worker.inPath}\n[ajc.classPath]:${worker.classPath}".info()
+        //content.debugFileStatus()
         worker.doWork()
+        //content.debugFileStatus()
         "[${content.file.absolutePath}]织入完毕".info()
     }
 

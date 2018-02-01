@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.0.5 *(2018-02-01)*
+----------------------------
+
+>  *Fix issue: Solving the problem of the previous transform can not clean build directory after Tomato transform finished*
+
 Version 1.0.5-alpha1 *(2017-12-14)*
 ----------------------------
 

@@ -7,10 +7,11 @@ import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.compile.JavaCompile
 
 class Worker {
-    private final def log
+    private final Logger log
     private List<File> inPath = new ArrayList<>()
     private List<File> aspectPath = new ArrayList<>()
     private List<File> classPath = new ArrayList<>()

@@ -1,4 +1,4 @@
-package com.forufamily.gradle.plugin.tasks.aj.java
+package com.forufamily.gradle.plugin.tasks.aj.generator
 
 import org.aspectj.org.eclipse.jdt.core.dom.*
 

@@ -47,10 +47,23 @@ abstract class BaseAspectTransform extends Transform {
         if (!invocation.incremental) invocation.outputProvider.deleteAll()
 
         if (hasAspectJrt) {
-            "项目[${project.name}]中发现AspectJrt-------------------".info()
+            "项目[${project.name}]中发现AspectJRT-------------------".info()
+            //invocation.debugFileStatus()
             doTransform(invocation, worker)
+            //invocation.debugFileStatus()
+            // If file was locked, we call gc and try to release it.
+            (0..60).any {
+                if (invocation.hasLockedFils()) {
+                    "some file is locked, try call to release it.".info()
+                    System.gc()
+                    Thread.sleep(1000)
+                } else {
+                    "all files are released.".info()
+                    return true
+                }
+            }
         } else {
-            "项目[${project.name}]中没有发现AspectJrt-------------------".info()
+            "项目[${project.name}]中没有发现AspectJRT-------------------".info()
             invocation.inputs.each { input ->
                 Utils.copyDirectory(input, invocation.outputProvider)
                 Utils.copyJars(input, invocation.outputProvider)
@@ -59,7 +72,7 @@ abstract class BaseAspectTransform extends Transform {
     }
 
     // 判断当前是否包含Aspectj运行时
-    protected boolean hasAspectJrt(TransformInvocation invocation) {
+    protected static boolean hasAspectJrt(TransformInvocation invocation) {
         for (transformInput in invocation.referencedInputs) {
             for (jarInput in transformInput.jarInputs) {
                 // After Desugar transform, the file's name was changed, but the 'JarInput' would be contain right info.
@@ -88,7 +101,7 @@ abstract class BaseAspectTransform extends Transform {
             dirs.each {
                 "".info()
                 "当前目录:${it.name}".info()
-                "目录[${it.name}]文件变动数量:${it.changedFiles.size()}" .info()
+                "目录[${it.name}]文件变动数量:${it.changedFiles.size()}".info()
                 "目录[${it.name}]文件变动列表:-----------------------START".info()
                 it.changedFiles.each { file, status ->
                     "文件[${file.name}], 状态:${status}".info()

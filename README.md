@@ -14,7 +14,7 @@ A gradle plugin for android project to use Aspectj, support java, kotlin. And In
 	  }
 	
 	  dependencies {
-	    classpath 'com.forufamily.gradle.plugin:tomato:1.0.4'
+	    classpath 'com.forufamily.gradle.plugin:tomato:1.0.5'
 	  }
 	}
 ```
